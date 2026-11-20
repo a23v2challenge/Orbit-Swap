@@ -1,0 +1,10 @@
+[toolchain]
+anchor_version = "0.32.1"
+solana_version = "4.2.2"
+
+[programs.devnet]
+orbit_swap = "EUBa3ZVZamiD8c18cPmfohEWnpTkeo9ZpSfB2kT7gNTs"
+
+[provider]
+cluster = "Devnet"
+wallet = "./devnet-keypair.json"

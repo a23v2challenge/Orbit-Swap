@@ -1,0 +1,5 @@
+storeDir: .cache/pnpm
+allowBuilds:
+  bigint-buffer: false
+  bufferutil: false
+  utf-8-validate: false

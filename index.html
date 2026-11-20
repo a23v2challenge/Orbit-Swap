@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Phantom 지갑으로 Solana Devnet에서 토큰 교환을 연습하는 웹 앱">
+    <meta name="theme-color" content="#0c1733">
+    <title>Orbit Swap · Solana Devnet</title>
+    <link rel="icon" href="data:,">
+    <script type="module" src="/src/bootstrap.mjs"></script>
+  </head>
+  <body>
+    <header class="masthead">
+      <div class="shell navigation">
+        <a href="./" class="brand"><span class="orbit" aria-hidden="true"></span>Orbit Swap</a>
+        <div class="navigation-actions">
+          <span class="network" id="network" role="status" data-state="waiting">Devnet 확인 중</span>
+          <button type="button" class="wallet-button" id="wallet-button">Phantom 연결</button>
+        </div>
+      </div>
+      <div class="shell introduction">
+        <h1>토큰 스왑 연습</h1>
+        <p>Phantom을 연결하고 Devnet 토큰으로 수수료와 실제 수령량을 확인하세요.</p>
+      </div>
+    </header>
+
+    <main class="shell">
+      <div class="message" id="message" role="status" hidden></div>
+      <div class="workspace">
+        <form class="panel swap-panel" id="swap-form">
+          <h2>스왑</h2>
+          <div class="amount-panel">
+            <div class="amount-header">
+              <label for="amount">보내는 수량</label>
+              <span class="balance" id="wallet-balance">잔액 —</span>
+            </div>
+            <div class="amount-line">
+              <input id="amount" name="amount" value="1" maxlength="27" inputmode="decimal" autocomplete="off" spellcheck="false" aria-describedby="quote-hint">
+              <div id="from-token" class="token"><span class="token-icon a">A</span><span>Token A</span></div>
+            </div>
+          </div>
+          <div class="direction-row">
+            <button type="button" id="direction" class="text-button">방향 전환</button>
+          </div>
+          <div class="amount-panel receive-panel">
+            <div class="amount-header"><span id="receive-label">예상 수령량</span></div>
+            <div class="amount-line">
+              <output id="receive" for="amount" aria-labelledby="receive-label">0.996006</output>
+              <div id="to-token" class="token"><span class="token-icon b">B</span><span>Token B</span></div>
+            </div>
+          </div>
+          <p id="quote-hint" class="hint">각각 1,000개가 든 초기 풀 기준입니다.</p>
+          <dl class="quote-terms">
+            <div><dt>스왑 수수료</dt><dd id="fee">0.30%</dd></div>
+            <div><dt>슬리피지 한도</dt><dd>0.50%</dd></div>
+            <div><dt>최소 수령량</dt><dd id="minimum">—</dd></div>
+          </dl>
+          <button type="submit" class="primary full" id="review" disabled>거래 내용 확인</button>
+        </form>
+
+        <aside class="workspace-side">
+          <section class="panel pool-panel" aria-labelledby="pool-heading">
+            <div class="panel-heading">
+              <h2 id="pool-heading">데모 풀</h2>
+              <button type="button" class="text-button small" id="refresh" aria-label="Devnet 상태와 잔액 새로고침">새로고침</button>
+            </div>
+            <p class="hint pool-description" id="pool-hint">풀을 만들면 각 토큰 1,000개를 풀에 넣고 지갑에 연습용 토큰을 100개씩 지급합니다.</p>
+            <dl class="reserves">
+              <div>
+                <dt><span class="token-icon a" aria-hidden="true">A</span>Token A</dt>
+                <dd id="reserve-a">1,000</dd>
+              </div>
+              <div>
+                <dt><span class="token-icon b" aria-hidden="true">B</span>Token B</dt>
+                <dd id="reserve-b">1,000</dd>
+              </div>
+            </dl>
+            <button type="button" class="secondary full" id="make-pool" disabled>데모 풀 만들기</button>
+            <div class="sol-row">
+              <span id="sol">Devnet SOL —</span>
+              <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer">테스트 SOL 받기</a>
+            </div>
+          </section>
+
+          <section class="panel activity-panel" aria-labelledby="activity-heading">
+            <div class="panel-heading">
+              <h2 id="activity-heading">최근 거래</h2>
+              <span id="receipt-status" class="receipt-status" hidden></span>
+            </div>
+            <p class="hint" id="activity-empty">확인된 거래의 수령량과 트랜잭션 서명이 여기에 표시됩니다.</p>
+            <div id="activity" aria-live="polite" hidden>
+              <p class="receipt-text" id="receipt-text"></p>
+              <a id="transaction-link" class="transaction-link" target="_blank" rel="noopener noreferrer">
+                <span>Solana Explorer에서 거래 보기</span>
+                <code id="signature"></code>
+              </a>
+              <button type="button" class="text-button small pending-button" id="recheck" hidden>거래 다시 확인</button>
+            </div>
+          </section>
+        </aside>
+      </div>
+
+      <footer>
+        <a href="https://help.phantom.com/articles/5997313271699" target="_blank" rel="noopener noreferrer">Phantom Devnet 설정</a>
+        <a id="program-link" target="_blank" rel="noopener noreferrer">프로그램 조회</a>
+      </footer>
+    </main>
+
+    <dialog id="confirmation" aria-labelledby="dialog-heading">
+      <h2 id="dialog-heading">거래 내용 확인</h2>
+      <dl id="review-details" class="quote-terms"></dl>
+      <p class="hint">네트워크 수수료는 Phantom 승인 화면에서 확인할 수 있습니다.</p>
+      <div class="dialog-actions">
+        <button type="button" class="secondary" id="cancel-review" autofocus>취소</button>
+        <button type="button" class="primary" id="approve">Phantom에서 승인</button>
+      </div>
+    </dialog>
+
+    <dialog id="completion-dialog" class="completion-dialog" aria-labelledby="completion-heading" aria-describedby="completion-summary">
+      <div class="completion-mark" aria-hidden="true">✓</div>
+      <p class="completion-eyebrow">SOLANA DEVNET</p>
+      <h2 id="completion-heading">거래가 완료됐어요</h2>
+      <p id="completion-summary" class="completion-summary"></p>
+      <div class="completion-meta">
+        <span>트랜잭션 서명</span>
+        <code id="completion-signature"></code>
+      </div>
+      <div class="dialog-actions completion-actions">
+        <button type="button" class="secondary" id="dismiss-completion">닫기</button>
+        <a id="completion-explorer" class="primary" target="_blank" rel="noopener noreferrer">Solana Explorer에서 보기 ↗</a>
+      </div>
+    </dialog>
+  </body>
+</html>

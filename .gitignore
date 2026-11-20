@@ -1,0 +1,15 @@
+node_modules/
+dist/
+target/
+.cache/
+coverage/
+playwright-report/
+test-results/
+*.log
+pnpm-debug.log*
+
+.env*
+!.env.example
+*-keypair.json
+
+.DS_Store
