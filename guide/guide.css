@@ -4,7 +4,7 @@
   border: 0;
   border-radius: 0.15rem;
   background: none;
-  color: #174da4;
+  color: var(--accent);
   font: inherit;
   text-decoration: underline;
   text-decoration-thickness: 0.09em;
@@ -14,16 +14,15 @@
 }
 
 .orbit-guide-term:hover {
-  color: #113676;
-  background: #e9f2ff;
+  color: var(--primary-dark);
+  background: var(--mint);
 }
 
-.masthead .orbit-guide-term { color: #a3d0ff; }
-.introduction h1 .orbit-guide-term { text-decoration: none; }
+.masthead .orbit-guide-term { color: var(--masthead-accent); }
 
 .masthead .orbit-guide-term:hover {
-  color: #dbeeff;
-  background: #a3d0ff24;
+  color: #f0fff5;
+  background: #b0edc724;
 }
 
 .orbit-guide-term:focus-visible {
@@ -33,7 +32,7 @@
 
 .orbit-guide-note {
   margin: 0.6rem 0 0;
-  color: var(--muted, #4e5e78);
+  color: var(--muted);
   font-size: 0.875rem;
   line-height: 1.6;
 }
@@ -45,13 +44,13 @@
   width: min(32rem, calc(100% - 1.5rem));
   max-height: min(42rem, calc(100dvh - 1.5rem));
   padding: 0;
-  border: 1px solid #d7e3f6;
+  border: 1px solid var(--border);
   border-radius: 1.15rem;
   background: #fff;
-  color: #14213a;
+  color: var(--ink);
 }
 
-.orbit-guide-dialog::backdrop { background: #0b173480; }
+.orbit-guide-dialog::backdrop { background: #102d2380; }
 
 .orbit-guide-content { padding: clamp(1.1rem, 5vw, 1.8rem); }
 
@@ -64,7 +63,7 @@
 
 .orbit-guide-section h3 {
   margin: 0 0 0.35rem;
-  color: #174da4;
+  color: var(--accent);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -77,9 +76,9 @@
 
 .orbit-guide-example {
   padding: 0.85rem 1rem;
-  border: 1px solid #d9e8fc;
+  border: 1px solid var(--border);
   border-radius: 0.7rem;
-  background: #f2f7ff;
+  background: var(--mint);
 }
 
 .orbit-guide-actions {
@@ -92,7 +91,7 @@
 }
 
 .orbit-guide-actions a {
-  color: #174da4;
+  color: var(--accent);
   font-size: 0.875rem;
   font-weight: 650;
 }

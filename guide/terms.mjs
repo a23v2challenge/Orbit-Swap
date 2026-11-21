@@ -23,18 +23,6 @@ export const terms = {
     example: "Solana의 Orca에서는 지갑을 연결하고, 교환용 토큰이 모여 있는 풀을 통해 한 토큰을 다른 토큰으로 바꿀 수 있어요.",
     source: "https://docs.orca.so/",
   },
-  token: {
-    title: "토큰",
-    meaning: "블록체인 위에서 발행하고 주고받을 수 있는 디지털 자산이에요. Orbit Swap의 Token A와 Token B는 교환 연습에 쓰는 토큰이에요.",
-    example: "미국 달러와 비슷한 가치를 유지하도록 설계된 USDC 토큰은 온라인 결제나 송금에 쓰여요.",
-    source: payments,
-  },
-  swap: {
-    title: "스왑 (토큰 교환)",
-    meaning: "한 토큰을 보내고 그 대가로 다른 토큰을 받는 일이에요. 여기서는 Token A를 Token B로 바꾸거나 반대로 바꿀 수 있어요.",
-    example: "Jupiter에서는 Solana에 있는 여러 교환 경로를 찾아 SOL을 USDC 같은 다른 자산으로 바꿀 수 있어요.",
-    source: swapGuide,
-  },
   phantom: {
     title: "Phantom 지갑",
     meaning: "토큰 잔액을 보고, 토큰을 보내고, 블록체인 앱의 거래를 승인할 수 있는 디지털 지갑 앱이에요.",

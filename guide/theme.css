@@ -1,0 +1,97 @@
+:root[data-orbit-theme="green"] {
+  --ink: #182e25;
+  --muted: #495f52;
+  --border: #d9e6dc;
+  --primary: #236a4e;
+  --primary-dark: #174b36;
+  --accent: #175b43;
+  --mint: #e8f4eb;
+  --mint-strong: #dceddf;
+  --surface: #f4f8f4;
+  --forest: #102d23;
+  --masthead-accent: #a8e5bf;
+  --focus: #377d57;
+
+  color: var(--ink);
+  background: #edf4ee;
+}
+
+[data-orbit-theme="green"] a:not(.brand, .primary) { color: var(--accent); }
+[data-orbit-theme="green"] :focus-visible { outline-color: var(--focus); }
+[data-orbit-theme="green"] .masthead :focus-visible { outline-color: var(--masthead-accent); }
+
+[data-orbit-theme="green"] .masthead {
+  background: radial-gradient(ellipse at 83% 115%, #245640, transparent 66%), var(--forest);
+}
+
+[data-orbit-theme="green"] .masthead::after {
+  border-color: #a8e5bf47;
+  box-shadow: 0 0 0 1.5rem #a8e5bf18, 0 0 0 3.4rem #a8e5bf0f, 0 0 0 5.5rem #a8e5bf0a;
+}
+
+[data-orbit-theme="green"] .navigation { border-bottom-color: #d5eee42b; }
+[data-orbit-theme="green"] .orbit { border-color: var(--masthead-accent); }
+[data-orbit-theme="green"] .orbit::after { background: #e5f7e9; }
+[data-orbit-theme="green"] .network,
+[data-orbit-theme="green"] .introduction p { color: #d6e9db; }
+[data-orbit-theme="green"] .network[data-state="waiting"]::before { background: #bdd0c2; }
+
+[data-orbit-theme="green"] .wallet-button {
+  color: var(--forest);
+  border-color: #b3d4bc;
+  background: #dcefe0;
+}
+
+[data-orbit-theme="green"] .wallet-button:hover { background: #edf8ee; }
+
+[data-orbit-theme="green"] .message:not([data-kind="error"]),
+[data-orbit-theme="green"] .amount-panel,
+[data-orbit-theme="green"] .token { border-color: var(--border); }
+
+[data-orbit-theme="green"] .panel { box-shadow: 0 5px 20px #1c462209; }
+[data-orbit-theme="green"] .amount-panel { background: var(--surface); }
+
+[data-orbit-theme="green"] .receive-panel {
+  background: var(--mint);
+  border-color: #cfe4d5;
+}
+
+[data-orbit-theme="green"] .amount-header { color: #355244; }
+[data-orbit-theme="green"] .amount-line input:not([aria-invalid="true"]),
+[data-orbit-theme="green"] .amount-line output { color: var(--ink); }
+
+[data-orbit-theme="green"] .token-icon.a {
+  color: #3f551f;
+  background: #e4edce;
+}
+
+[data-orbit-theme="green"] .token-icon.b {
+  color: #18543f;
+  background: #cdebd9;
+}
+
+[data-orbit-theme="green"] .text-button,
+[data-orbit-theme="green"] .secondary { color: var(--accent); }
+[data-orbit-theme="green"] .text-button:hover:not(:disabled) { background: var(--mint); }
+
+[data-orbit-theme="green"] .secondary {
+  background: var(--mint);
+  border-color: var(--border);
+}
+
+[data-orbit-theme="green"] .secondary:hover:not(:disabled) { background: var(--mint-strong); }
+
+[data-orbit-theme="green"] .primary:disabled,
+[data-orbit-theme="green"] .secondary:disabled {
+  color: var(--muted);
+  background: #e9efea;
+}
+
+[data-orbit-theme="green"] .reserves > div,
+[data-orbit-theme="green"] .completion-meta { background: var(--surface); }
+[data-orbit-theme="green"] .receipt-status[data-state="pending"],
+[data-orbit-theme="green"] .transaction-link code,
+[data-orbit-theme="green"] .completion-meta code { color: var(--muted); }
+
+[data-orbit-theme="green"] dialog { box-shadow: 0 20px 60px #102d234d; }
+[data-orbit-theme="green"] dialog:not(.orbit-guide-dialog)::backdrop { background: #102d2399; }

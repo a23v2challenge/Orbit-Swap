@@ -4,7 +4,7 @@
 
 | 버전 | 무엇을 할 수 있나요? |
 | --- | --- |
-| [웹 데모](https://a23v2challenge.github.io/Orbit-Swap/) | Phantom 지갑을 연결해 Solana Devnet에서 테스트 토큰을 교환합니다. 거래 전에도 파란 밑줄의 용어 설명을 읽을 수 있습니다. |
+| [웹 데모](https://a23v2challenge.github.io/Orbit-Swap/) | Phantom 지갑을 연결해 Solana Devnet에서 테스트 토큰을 교환합니다. 거래 전에도 밑줄 친 용어의 설명을 읽을 수 있습니다. |
 | [macOS 앱](orbit-swap-desktop/) | Rust와 GPUI로 만든 앱에서 지갑 없이 가상 토큰을 교환합니다. 쉬운 용어 설명과 교환 전후 수량 변화를 확인할 수 있습니다. |
 
 ## 웹 · Solana Devnet

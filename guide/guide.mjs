@@ -1,4 +1,5 @@
 import { terms } from "./terms.mjs";
+import "./theme.css";
 import "./guide.css";
 
 const dialog = document.createElement("dialog");
@@ -71,7 +72,6 @@ const quoteTerms = [
 ];
 
 const staticLabels = [
-  [".introduction h1", [["토큰", "token"], ["스왑", "swap"]]],
   [".introduction p", [["Phantom", "phantom"], ["Devnet", "devnet"]]],
   ["#receive-label", quoteTerms],
   [".swap-panel .quote-terms dt", quoteTerms],
@@ -97,7 +97,7 @@ addNote(
   "Solana 블록체인에서 연습용 토큰을 교환하며 DeFi를 체험해 보세요.",
   [["Solana", "solana"], ["블록체인", "blockchain"], ["DeFi", "defi"]],
 );
-addNote(".introduction p:last-child", "파란 밑줄을 누르면 쉬운 뜻과 실제 쓰임을 볼 수 있어요.");
+addNote(".introduction p:last-child", "밑줄 친 용어를 누르면 쉬운 뜻과 실제 쓰임을 볼 수 있어요.");
 addNote(
   "#pool-hint",
   "Rust로 작성한 Solana 프로그램이 상수곱 방식으로 받을 수량을 계산해요.",
