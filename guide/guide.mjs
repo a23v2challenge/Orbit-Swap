@@ -2,6 +2,79 @@ import { terms } from "./terms.mjs";
 import "./theme.css";
 import "./guide.css";
 
+const appearanceControl = document.querySelector(".appearance-control");
+const appearanceToggle = document.getElementById("appearance-toggle");
+const appearanceMenu = document.getElementById("appearance-menu");
+const appearanceStorageKey = "orbit-swap:appearance";
+const validModes = new Set(["light", "dark"]);
+const validThemes = new Set(["green", "blue", "violet", "amber"]);
+const themeColors = {
+  green: { light: "#e2eee4", dark: "#14261a" },
+  blue: { light: "#e0edf4", dark: "#142b3a" },
+  violet: { light: "#ece5f6", dark: "#21152f" },
+  amber: { light: "#f3e8d4", dark: "#302417" },
+};
+
+const systemMode = window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+let appearance = { mode: systemMode, theme: "green" };
+try {
+  const savedAppearance = JSON.parse(localStorage.getItem(appearanceStorageKey) ?? "null");
+  if (savedAppearance && validModes.has(savedAppearance.mode) && validThemes.has(savedAppearance.theme)) {
+    appearance = savedAppearance;
+  }
+} catch {
+  // Keep the defaults when storage is unavailable or contains invalid data.
+}
+
+function applyAppearance(save = false) {
+  document.documentElement.dataset.orbitMode = appearance.mode;
+  document.documentElement.dataset.orbitTheme = appearance.theme;
+  document.querySelector('meta[name="theme-color"]')?.setAttribute("content", themeColors[appearance.theme][appearance.mode]);
+  for (const button of appearanceMenu.querySelectorAll("[data-mode]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.mode === appearance.mode));
+  }
+  for (const button of appearanceMenu.querySelectorAll("[data-theme]")) {
+    button.setAttribute("aria-pressed", String(button.dataset.theme === appearance.theme));
+  }
+  if (save) {
+    try {
+      localStorage.setItem(appearanceStorageKey, JSON.stringify(appearance));
+    } catch {
+      // The selected appearance still applies for this visit if storage is unavailable.
+    }
+  }
+}
+
+function closeAppearanceMenu(returnFocus = false) {
+  appearanceMenu.hidden = true;
+  appearanceToggle.setAttribute("aria-expanded", "false");
+  if (returnFocus) appearanceToggle.focus();
+}
+
+appearanceToggle.addEventListener("click", () => {
+  const isOpen = appearanceToggle.getAttribute("aria-expanded") === "true";
+  appearanceMenu.hidden = isOpen;
+  appearanceToggle.setAttribute("aria-expanded", String(!isOpen));
+});
+
+appearanceMenu.addEventListener("click", event => {
+  const modeButton = event.target.closest("[data-mode]");
+  const themeButton = event.target.closest("[data-theme]");
+  if (modeButton) appearance.mode = modeButton.dataset.mode;
+  if (themeButton) appearance.theme = themeButton.dataset.theme;
+  if (modeButton || themeButton) applyAppearance(true);
+});
+
+document.addEventListener("click", event => {
+  if (!appearanceControl.contains(event.target)) closeAppearanceMenu();
+});
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape" && !appearanceMenu.hidden) closeAppearanceMenu(true);
+});
+
+applyAppearance();
+
 const dialog = document.createElement("dialog");
 dialog.className = "orbit-guide-dialog";
 dialog.setAttribute("aria-labelledby", "orbit-guide-title");

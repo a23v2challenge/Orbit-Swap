@@ -231,31 +231,59 @@ async function blockhashStillValid(connection, blockhash, lastValidBlockHeight) 
 }
 
 export async function signWithPhantom(connection, provider, owner, instructions) {
-  const { draft, blockhash, lastValidBlockHeight } = await draftTransaction(connection, owner, instructions);
-  return { ...await signDraft(provider, owner, instructions, draft, blockhash), lastValidBlockHeight };
+  return prepareWithPhantom(connection, provider, owner, instructions);
 }
 
-export async function sendWithPhantom(connection, provider, owner, instructions) {
-  const { draft, blockhash, lastValidBlockHeight } = await draftTransaction(connection, owner, instructions);
-  const simulation = await connection.simulateTransaction(draft, undefined, [owner]);
+function withComputeUnitLimit(instructions, units) {
+  const withoutLimit = instructions.filter(instruction => computeBudgetValue(instruction)?.type !== "limit");
+  return [ComputeBudgetProgram.setComputeUnitLimit({ units }), ...withoutLimit];
+}
+
+export async function prepareWithPhantom(connection, provider, owner, instructions) {
+  const configuredBudget = splitInstructions(instructions).computeBudget;
+  if (configuredBudget.unsupported.length || configuredBudget.limit.length > 1 || configuredBudget.price.length > 1) {
+    throw new Error("거래에 지원하지 않는 Compute Budget 설정이 있어 제출을 중단했습니다.");
+  }
+
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash(commitment);
+  const simulationInstructions = withComputeUnitLimit(instructions, MAX_COMPUTE_UNIT_LIMIT);
+  const simulationDraft = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight }).add(...simulationInstructions);
+  const simulation = await connection.simulateTransaction(simulationDraft, undefined, [owner]);
   if (simulation.value.err) {
     const logs = simulation.value.logs?.slice(-4).join(" · ") ?? "";
     throw new Error(`Devnet 사전 시뮬레이션 실패: ${logs || JSON.stringify(simulation.value.err)}`);
   }
-  const { raw, signature, priorityFeeLamports } = await signDraft(
-    provider, owner, instructions, draft, blockhash, simulation.value.unitsConsumed,
+  const simulatedUnits = simulation.value.unitsConsumed;
+  if (!Number.isSafeInteger(simulatedUnits) || simulatedUnits < 0) {
+    throw new Error("Devnet 시뮬레이션에서 Compute Unit 사용량을 확인하지 못했습니다.");
+  }
+  const requestedUnits = Math.ceil(simulatedUnits * 1.1);
+  if (requestedUnits > MAX_COMPUTE_UNIT_LIMIT) {
+    throw new Error("거래가 Solana의 최대 Compute Unit 한도에 10% 여유를 더한 범위를 넘어 제출을 중단했습니다.");
+  }
+
+  const finalInstructions = withComputeUnitLimit(instructions, Math.max(1, requestedUnits));
+  const draft = new Transaction({ feePayer: owner, blockhash, lastValidBlockHeight }).add(...finalInstructions);
+  const signed = await signDraft(
+    provider, owner, finalInstructions, draft, blockhash, simulatedUnits,
   );
   if (!await blockhashStillValid(connection, blockhash, lastValidBlockHeight)) {
     const error = new Error("승인 중 Devnet blockhash가 실제로 만료되어 거래를 보내지 않았습니다. 새 승인 요청이 필요합니다.");
     error.code = "BLOCKHASH_EXPIRED";
     throw error;
   }
+  return { ...signed, blockhash, lastValidBlockHeight, computeUnitLimit: Math.max(1, requestedUnits) };
+}
+
+export async function sendPreparedTransaction(connection, prepared) {
+  const { raw, signature, blockhash, lastValidBlockHeight, priorityFeeLamports, computeUnitLimit } = prepared;
   try {
     const sentSignature = await connection.sendRawTransaction(raw, {
       preflightCommitment: commitment,
       maxRetries: 3,
     });
-    return { signature: sentSignature, lastValidBlockHeight, priorityFeeLamports };
+    if (sentSignature !== signature) throw new Error("Devnet RPC가 서명된 거래와 다른 서명을 반환했습니다.");
+    return { signature, lastValidBlockHeight, priorityFeeLamports, computeUnitLimit };
   } catch (error) {
     if (!/blockhash not found/i.test(String(error?.message ?? error))) throw error;
     if (!await blockhashStillValid(connection, blockhash, lastValidBlockHeight)) {
@@ -271,12 +299,13 @@ export async function sendWithPhantom(connection, provider, owner, instructions)
         skipPreflight: true,
         maxRetries: 3,
       });
-      return { signature: sentSignature, lastValidBlockHeight, priorityFeeLamports };
+      if (sentSignature !== signature) throw new Error("Devnet RPC가 서명된 거래와 다른 서명을 반환했습니다.");
+      return { signature, lastValidBlockHeight, priorityFeeLamports, computeUnitLimit };
     } catch (retryError) {
       const statusResponse = await connection.getSignatureStatuses([signature], { searchTransactionHistory: true });
       const [status] = statusResponse.value;
       if (status) {
-        return { signature, lastValidBlockHeight, priorityFeeLamports };
+        return { signature, lastValidBlockHeight, priorityFeeLamports, computeUnitLimit };
       }
       const rejected = new Error(`Devnet RPC가 유효한 blockhash 거래를 재전송에서도 거절했습니다. ${String(retryError?.message ?? retryError)}`);
       rejected.code = "RPC_BLOCKHASH_REJECTED";
@@ -284,6 +313,11 @@ export async function sendWithPhantom(connection, provider, owner, instructions)
       throw rejected;
     }
   }
+}
+
+export async function sendWithPhantom(connection, provider, owner, instructions) {
+  const prepared = await prepareWithPhantom(connection, provider, owner, instructions);
+  return sendPreparedTransaction(connection, prepared);
 }
 
 export async function readTransactionStatus(connection, signature, lastValidBlockHeight) {

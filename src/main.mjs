@@ -1,8 +1,8 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import { calculateQuote, formatAmount, INITIAL_RESERVE, parseAmount } from "./quote.mjs";
 import {
-  checkDevnet, DEFAULT_PROGRAM_ID, DEVNET_RPC, initializeInstructions, poolAddresses, readPool,
-  readSwapOutput, readTransactionStatus, sendWithPhantom, swapInstructions,
+  checkDevnet, DEFAULT_PROGRAM_ID, DEVNET_RPC, initializeInstructions, poolAddresses, prepareWithPhantom,
+  readPool, readSwapOutput, readTransactionStatus, sendPreparedTransaction, swapInstructions,
 } from "./solana.mjs";
 import "./style.css";
 
@@ -33,6 +33,9 @@ function explain(error) {
   const errorMessage = String(error?.message ?? "").replace(/\s+/g, " ").trim();
   const details = [errorMessage, ...logs].join(" ");
   if (error?.code === 4001 || /user rejected|user denied/i.test(details)) return "Phantom에서 요청을 취소했습니다.";
+  if (error?.code === "PENDING_RECORD_STORAGE") {
+    return "중복 거래를 막기 위한 기록을 저장하지 못해 제출하지 않았습니다. 브라우저 저장 공간을 확인한 뒤 다시 시도해 주세요.";
+  }
   if (error?.code === "BLOCKHASH_EXPIRED") {
     return "승인하는 동안 Devnet blockhash가 실제로 만료되어 제출되지 않았습니다. 다시 요청한 뒤 Phantom에서 바로 승인해 주세요.";
   }
@@ -208,12 +211,13 @@ function loadRecord(owner) {
 }
 
 function saveRecord(owner, record) {
-  if (state.owner?.equals(owner)) state.record = record;
   try {
     localStorage.setItem(storageKey(owner), JSON.stringify(record));
   } catch {
-    return;
+    return false;
   }
+  if (state.owner?.equals(owner)) state.record = record;
+  return true;
 }
 
 async function refresh() {
@@ -320,6 +324,7 @@ async function submit(kind, reviewedTrade) {
   state.busy = kind;
   render();
   message("Phantom에서 거래 내용을 확인한 뒤 바로 승인해 주세요. 오래 기다리면 거래가 만료되어 다시 요청해야 합니다.");
+  let persistedRecord = null;
   try {
     const deployed = await checkDevnet(connection, programId);
     if (!deployed) throw new Error("Orbit Swap 프로그램이 Devnet에서 확인되지 않습니다.");
@@ -334,24 +339,54 @@ async function submit(kind, reviewedTrade) {
         { createOutputAccount: !outputAccountExists },
       );
     }
+    const prepared = await prepareWithPhantom(connection, wallet, owner, instructions);
     if (!state.owner?.equals(owner) || !wallet.publicKey?.equals(owner)) {
       throw new Error("지갑 계정이 바뀌어 거래를 전송하지 않았습니다.");
     }
-    const { signature, lastValidBlockHeight } = await sendWithPhantom(connection, wallet, owner, instructions);
     const record = {
-      signature, lastValidBlockHeight, kind, status: "pending",
+      signature: prepared.signature,
+      lastValidBlockHeight: prepared.lastValidBlockHeight,
+      kind,
+      status: "pending",
       aToB: reviewedTrade?.aToB ?? true,
       amountIn: kind === "swap" ? reviewedTrade.amountIn.toString() : null,
     };
-    saveRecord(owner, record);
-    message();
+    if (!saveRecord(owner, record)) {
+      const error = new Error("중복 제출 방지를 위한 거래 기록을 저장하지 못했습니다.");
+      error.code = "PENDING_RECORD_STORAGE";
+      throw error;
+    }
+    persistedRecord = record;
+    message("서명된 거래의 확인 정보를 저장하고 Devnet 제출 결과를 확인하고 있습니다.");
     render();
+
+    let submissionError = null;
+    try {
+      await sendPreparedTransaction(connection, prepared);
+    } catch (error) {
+      submissionError = error;
+      console.error("[Orbit Swap] transaction submission response uncertain", error);
+    }
+
     await settle(owner, addresses, record, 10);
     await refresh();
-    if (record.status === "confirmed") showCompletion(record);
+    if (record.status === "confirmed") {
+      message();
+      showCompletion(record);
+    } else if (record.status === "failed") {
+      message("서명된 거래가 Devnet에서 실패한 것을 확인했습니다. 수수료가 발생했을 수 있습니다.", "error");
+    } else if (record.status === "expired") {
+      message("기존 거래의 만료를 확인했습니다. 최신 견적에서 다시 요청할 수 있습니다.");
+    } else if (submissionError) {
+      message("RPC에서 제출 결과를 확인하지 못했습니다. 아래 서명을 조회 중이며, 거래가 확인되거나 만료될 때까지 새 승인을 막습니다.", "error");
+    }
   } catch (error) {
     console.error("[Orbit Swap] transaction failed", error);
-    message(explain(error), "error");
+    if (!persistedRecord) {
+      message(explain(error), "error");
+    } else if (persistedRecord.status === "pending") {
+      message("거래 결과를 확인 중입니다. 기존 서명이 확정되거나 만료되기 전까지 새 승인을 막습니다.", "error");
+    }
     await refresh();
   } finally {
     state.busy = "";

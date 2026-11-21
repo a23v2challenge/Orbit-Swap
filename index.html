@@ -14,6 +14,32 @@
       <div class="shell navigation">
         <a href="./" class="brand"><span class="orbit" aria-hidden="true"></span>Orbit Swap</a>
         <div class="navigation-actions">
+          <div class="appearance-control">
+            <button type="button" class="appearance-toggle" id="appearance-toggle" aria-label="화면 설정" aria-haspopup="true" aria-expanded="false" aria-controls="appearance-menu" title="화면 설정">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M12 3.5v2M12 18.5v2M20.5 12h-2M5.5 12h-2m14.51-6.01-1.42 1.42M7.41 16.59l-1.42 1.42m12.02 0-1.42-1.42M7.41 7.41 5.99 5.99"></path>
+                <circle cx="12" cy="12" r="4"></circle>
+              </svg>
+            </button>
+            <div class="appearance-menu" id="appearance-menu" role="group" aria-label="화면 설정" hidden>
+              <div class="appearance-section">
+                <span class="appearance-label">화면 모드</span>
+                <div class="appearance-mode-options" role="group" aria-label="화면 모드 선택">
+                  <button type="button" class="appearance-choice" data-mode="light" aria-pressed="true">라이트</button>
+                  <button type="button" class="appearance-choice" data-mode="dark" aria-pressed="false">다크</button>
+                </div>
+              </div>
+              <div class="appearance-section">
+                <span class="appearance-label">테마 색상</span>
+                <div class="appearance-theme-options" role="group" aria-label="테마 색상 선택">
+                  <button type="button" class="appearance-theme-choice" data-theme="green" aria-pressed="true"><span class="theme-swatch swatch-green" aria-hidden="true"></span>그린</button>
+                  <button type="button" class="appearance-theme-choice" data-theme="blue" aria-pressed="false"><span class="theme-swatch swatch-blue" aria-hidden="true"></span>블루</button>
+                  <button type="button" class="appearance-theme-choice" data-theme="violet" aria-pressed="false"><span class="theme-swatch swatch-violet" aria-hidden="true"></span>바이올렛</button>
+                  <button type="button" class="appearance-theme-choice" data-theme="amber" aria-pressed="false"><span class="theme-swatch swatch-amber" aria-hidden="true"></span>앰버</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <span class="network" id="network" role="status" data-state="waiting">Devnet 확인 중</span>
           <button type="button" class="wallet-button" id="wallet-button">Phantom 연결</button>
         </div>
