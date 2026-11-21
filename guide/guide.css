@@ -1,0 +1,97 @@
+.orbit-guide-term {
+  display: inline;
+  padding: 0;
+  border: 0;
+  border-radius: 0.15rem;
+  background: none;
+  color: #174da4;
+  font: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.18em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.orbit-guide-term:hover {
+  color: #113676;
+  background: #e9f2ff;
+}
+
+.masthead .orbit-guide-term { color: #a3d0ff; }
+
+.masthead .orbit-guide-term:hover {
+  color: #dbeeff;
+  background: #a3d0ff24;
+}
+
+.orbit-guide-term:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.orbit-guide-note {
+  margin: 0.6rem 0 0;
+  color: var(--muted, #4e5e78);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.introduction .orbit-guide-note { max-width: 36rem; }
+.introduction .orbit-guide-note:last-child { font-size: 0.875rem; }
+
+.orbit-guide-dialog {
+  width: min(32rem, calc(100% - 1.5rem));
+  max-height: min(42rem, calc(100dvh - 1.5rem));
+  padding: 0;
+  border: 1px solid #d7e3f6;
+  border-radius: 1.15rem;
+  background: #fff;
+  color: #14213a;
+}
+
+.orbit-guide-dialog::backdrop { background: #0b173480; }
+
+.orbit-guide-content { padding: clamp(1.1rem, 5vw, 1.8rem); }
+
+.orbit-guide-content h2 {
+  font-size: clamp(1.3rem, 5vw, 1.65rem);
+  line-height: 1.35;
+}
+
+.orbit-guide-section { margin-top: 1.15rem; }
+
+.orbit-guide-section h3 {
+  margin: 0 0 0.35rem;
+  color: #174da4;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.orbit-guide-section p {
+  margin: 0;
+  font-size: 0.975rem;
+  line-height: 1.7;
+}
+
+.orbit-guide-example {
+  padding: 0.85rem 1rem;
+  border: 1px solid #d9e8fc;
+  border-radius: 0.7rem;
+  background: #f2f7ff;
+}
+
+.orbit-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-top: 1.15rem;
+}
+
+.orbit-guide-actions a {
+  color: #174da4;
+  font-size: 0.875rem;
+  font-weight: 650;
+}
