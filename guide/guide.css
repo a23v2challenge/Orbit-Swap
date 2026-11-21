@@ -19,6 +19,7 @@
 }
 
 .masthead .orbit-guide-term { color: #a3d0ff; }
+.introduction h1 .orbit-guide-term { text-decoration: none; }
 
 .masthead .orbit-guide-term:hover {
   color: #dbeeff;
