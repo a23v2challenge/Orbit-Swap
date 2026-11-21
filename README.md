@@ -1,3 +1,14 @@
+# Orbit Swap
+
+토큰 교환의 수수료, 예상 수령량, 거래 기록을 배우는 프로젝트입니다.
+
+| 버전 | 무엇을 할 수 있나요? |
+| --- | --- |
+| [웹 데모](https://a23v2challenge.github.io/Orbit-Swap/) | Phantom 지갑을 연결해 Solana Devnet에서 테스트 토큰을 교환합니다. 거래 전에도 파란 밑줄의 용어 설명을 읽을 수 있습니다. |
+| [macOS 앱](orbit-swap-desktop/) | Rust와 GPUI로 만든 앱에서 지갑 없이 가상 토큰을 교환합니다. 쉬운 용어 설명과 교환 전후 수량 변화를 확인할 수 있습니다. |
+
+## 웹 · Solana Devnet
+
 > **Devnet 전용 데모입니다.** 표시되는 토큰과 SOL은 테스트 자산이며 실물 가치가 없습니다. 지갑 서명은 사용자가 Phantom에서 직접 확인해야 합니다.
  
 ## 주요 기능
